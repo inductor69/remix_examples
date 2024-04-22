@@ -357,3 +357,34 @@ label > [type="radio"] {
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
 }
+
+.centered-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10%;
+  /* justify-content: center; */
+  height: 100vh; /* Full viewport height */
+}
+.pagination {
+  display: flex;
+  /* justify-content: center; */
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.page-link {
+  display: inline-block;
+  padding: 10px;
+  margin: 0 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-decoration: none;
+  color: #FFCC00;
+  transition: background-color 0.3s ease;
+}
+
+.page-link:hover {
+  background-color: #f0f0f0;
+}
+

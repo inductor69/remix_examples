@@ -1,7 +1,7 @@
 import type { LinksFunction, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import { useState } from "react";
 import { Form, Link, Outlet, useLoaderData } from "@remix-run/react";
-
 import stylesUrl from "~/styles/jokes.css";
 import { db } from "~/utils/db.server";
 import { getUser } from "~/utils/session.server";
@@ -12,29 +12,34 @@ export const links: LinksFunction = () => [
 
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await getUser(request);
+  const users = await db.user.findMany({
+    select: { id: true, username: true },
+    orderBy: { username: "asc" },
+  });
 
-  // In the official deployed version of the app, we don't want to deploy
-  // a site with none-moderated content, so we only show users their own jokes
-  const jokeListItems = user
-    ? await db.joke.findMany({
-        orderBy: { createdAt: "desc" },
-        select: { id: true, name: true },
-        take: 5,
-        where: { jokesterId: user.id },
-      })
-    : [];
+  const jokes = await db.joke.findMany({
+    orderBy: { createdAt: "desc" },
+    select: { id: true, name: true, jokesterId: true },
+    take: 5,
+  });
 
-  return json({ jokeListItems, user });
+  return json({ jokes, user, users });
 };
 
 export default function JokesRoute() {
   const data = useLoaderData<typeof loader>();
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
+  const filteredJokes = selectedUser
+    ? data.jokes.filter((joke) => joke.jokesterId === selectedUser)
+    : data.jokes;
+
+  console.log(filteredJokes, 'dataas');
   return (
     <div className="jokes-layout">
       <header className="jokes-header">
         <div className="container">
-          <h1 className="home-link">
+        <h1 className="home-link">
             <Link to="/" title="Remix Jokes" aria-label="Remix Jokes">
               <span className="logo">🤪</span>
               <span className="logo-medium">J🤪KES</span>
@@ -57,13 +62,32 @@ export default function JokesRoute() {
       <main className="jokes-main">
         <div className="container">
           <div className="jokes-list">
+          <div className="user-select-wrapper">
+  <label htmlFor="user-select" className="user-select-label">Select a user:</label>
+  <div className="select-container">
+    <select
+      id="user-select"
+      value={selectedUser || ""}
+      onChange={(e) => setSelectedUser(e.target.value || null)}
+      className="user-select"
+    >
+      <option value="">All users</option>
+      {data.users.map((user) => (
+        <option key={user.id} value={user.id}>
+          {user.username}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+
             <Link to=".">Get a random joke</Link>
             <p>Here are a few more jokes to check out:</p>
             <ul>
-              {data.jokeListItems.length > 0 ? (
-                data.jokeListItems.map(({ id, name }) => (
+              {filteredJokes.length > 0 ? (
+                filteredJokes.map(({ id, name, jokesterId }) => (
                   <li key={id}>
-                    <Link prefetch="intent" to={id}>
+                    <Link prefetch="intent" to={`/jokes/${id}`}>
                       {name}
                     </Link>
                   </li>
