@@ -388,3 +388,21 @@ label > [type="radio"] {
   background-color: #f0f0f0;
 }
 
+
+.user-select {
+  background-color: rgb(255,204,0); /* Change to desired background color */
+  padding: 10px; /* Increase padding for larger size */
+  font-size: 16px; /* Increase font size for larger size */
+  border: 1px solid #ccc; /* Add border for better visual separation */
+  border-radius: 5px; /* Add border-radius for rounded corners */
+  width: 100%; /* Make the dropdown full width */
+  max-width: 300px; /* Limit the maximum width for better readability */
+  box-sizing: border-box; /* Ensure padding and border are included in width */
+  margin-bottom: 10px;
+}
+
+/* Additional styles for the label to maintain consistency */
+.user-select-label {
+  margin-bottom: 10px; /* Add spacing below label */
+  display: block; /* Ensure the label takes up full width */
+}
